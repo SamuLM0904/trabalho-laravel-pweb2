@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('avaliacao_fisicas', function (Blueprint $table) {
+        Schema::create('categoria_alunos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('aluno_id')->unique()->constrained('alunos')->onDelete('cascade');
-            $table->decimal('peso', 5, 2);
-            $table->decimal('altura', 3, 2);
-            $table->string('objetivo_treino', 255);
+            $table->string('nome', 80);
+            $table->string('nivel', 40)->nullable();
             $table->timestamps();
         });
     }
@@ -26,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('avaliacao_fisicas');
+        Schema::dropIfExists('categoria_alunos');
     }
 };

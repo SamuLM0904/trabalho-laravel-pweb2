@@ -7,17 +7,22 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Aluno extends Model
 {
-    use HasFactory;
+    use Hasfactory;
 
     protected $fillable = [
         'nome',
-        'email',
         'cpf',
         'telefone',
+        'imagem',
+        'categoria_id',
     ];
 
-    public function avaliacaoFisica()
+    protected $cast = [
+        'categoria_id' => 'integer'
+    ];
+
+    public function categoria()
     {
-        return $this->hasOne(AvaliacaoFisica::class, 'aluno_id');
+        return $this->belongsTo(CategoriaAluno::class, 'categoria_id');
     }
 }

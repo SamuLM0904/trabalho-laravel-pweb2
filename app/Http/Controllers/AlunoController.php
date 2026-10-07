@@ -4,44 +4,56 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Aluno;
+use App\Models\CategoriaAluno;
 
 class AlunoController extends Controller
 {
     public function index()
     {
-        $dados = Aluno::all();
+        $dados = Aluno::All();
 
         return view('aluno.list')->with(['dados' => $dados]);
     }
 
     function create()
     {
-        return view('aluno.form');
+        $categorias = CategoriaAluno::orderBy('nome')->get();
+
+        return view('aluno.form')->with(compact('categorias'));
     }
+
 
     function validateForm(Request $request)
     {
         $request->validate([
             'nome' => 'required',
-            'email' => 'required|email',
-            'cpf' => ['required', 'regex:/^[0-9.\-]+$/'],
-            'telefone' => ['required', 'regex:/^[0-9()\-\s]+$/'],
+            'cpf' => 'required',
+            'categoria_id' => 'required',
+            'imagem' => 'nullable|image|mimes:png,jpg,jpeg',
         ], [
-            'nome.required' => "O campo Nome é obrigatório.",
-            'email.required' => "O campo E-mail é obrigatório.",
-            'email.email' => "Informe um E-mail válido.",
-            'cpf.required' => "O campo CPF é obrigatório.",
-            'cpf.regex' => "O CPF deve conter apenas números, pontos e traço (ex: 123.456.789-00 ou 12345678900).",
-            'telefone.required' => "O campo Telefone é obrigatório.",
-            'telefone.regex' => "O Telefone deve conter apenas números, parênteses e traço (ex: (11) 99999-9999 ou 11999999999)."
+            'nome.required' => "O :attribute é obrigatorio",
+            'cpf.required' => "O :attribute é obrigatorio",
+            'imagem.image' => "O :attribute deve ser enviado",
+            'imagem.mimes' => "O :attribute deve ser das extensões:PNG,JPEG,JPG",
         ]);
     }
 
     function store(Request $request)
     {
+        //dd($request->all());
         $this->validateForm($request);
 
-        Aluno::create($request->all());
+        $data = $request->all();
+        $imagem = $request->file('imagem');
+
+        if ($imagem) {
+            $nome_imagem = date('YmdiHs') . "." . $imagem->getClientOriginalExtension();
+            $diretorio = "imagem/aluno/";
+            $imagem->storeAs($diretorio, $nome_imagem, 'public');
+            $data['imagem'] = $diretorio . $nome_imagem;
+        }
+
+        Aluno::create($data);
 
         return redirect('aluno')->with("success", 'Registro Salvo com sucesso!');
     }
@@ -49,15 +61,30 @@ class AlunoController extends Controller
     function edit($id)
     {
         $data = Aluno::find($id);
+        $categorias = CategoriaAluno::orderBy('nome')->get();
 
-        return view('aluno.form', compact('data'));
+        // dd($categorias);
+        return view('aluno.form')->with(compact('data', 'categorias'));
     }
+
 
     function update(Request $request, $id)
     {
+        //dd($request->all());
         $this->validateForm($request);
 
-        Aluno::find($id)->update($request->all());
+        $data = $request->all();
+        $imagem = $request->file('imagem');
+
+        if ($imagem) {
+            $nome_imagem = date('YmdiHs') . "." . $imagem->getClientOriginalExtension();
+            $diretorio = "imagem/aluno/";
+
+            $imagem->storeAs($diretorio, $nome_imagem, 'public');
+            $data['imagem'] = $diretorio . $nome_imagem;
+        }
+
+        Aluno::find($id)->update($data);
 
         return redirect('aluno')->with("success", 'Registro Atualizado com sucesso!');
     }
@@ -78,7 +105,7 @@ class AlunoController extends Controller
                 "%$request->valor%"
             )->get();
         } else {
-            $dados = Aluno::all();
+            $dados = Aluno::All();
         }
 
         return view('aluno.list', compact('dados'));
