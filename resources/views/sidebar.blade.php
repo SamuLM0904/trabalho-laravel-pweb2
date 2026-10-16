@@ -4,22 +4,31 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
-      <a class="navbar-brand" href="#">SIG-ACAD</a>
+      <a class="navbar-brand" href="{{ route('dashboard') }}">SIG-ACAD</a>
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Início</a>
+          <a class="nav-link" href="{{ route('dashboard') }}">Início</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{{ url('aluno') }}">Aluno</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ url('curso') }}">Curso</a>
+          <a class="nav-link" href="{{ url('plano') }}">Planos</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ url('matricula') }}">Matricula</a>
+          <a class="nav-link" href="{{ url('modalidade') }}">Modalidades</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+          <a class="nav-link" href="{{ url('avaliacao') }}">Avaliações</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url('equipamento') }}">Equipamentos</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url('curso') }}">Cursos</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url('matricula') }}">Matrículas</a>
         </li>
       </ul>
     </div>

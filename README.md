@@ -24,6 +24,11 @@ Código-Fonte do Projeto desenvolvido durante as aulas de programação web 2 co
 **Ou criar as tabelas e insere os registros no banco de dados do projeto**  
 `php artisan migrate --seed` 
 
+**Para exibir as fotos enviadas no sistema**  
+`php artisan storage:link`
+
+No sistema da academia, cadastre pelo menos um plano antes de cadastrar alunos. Cada aluno pode ter uma única avaliação física.
+
 **Se ainda apresentar erro 500, deve gerar a key do projeto**  
 `php artisan key:generate` 
 
