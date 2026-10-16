@@ -11,9 +11,6 @@
 ## About this Project - Programação Web 2 com Laravel 2026.2
 Código-Fonte do Projeto desenvolvido durante as aulas de programação web 2 com PHP e Laravel no curso técnico integrado do IFSC 2026.2
 
-### Créditos e referência
-Este projeto contém referências e estrutura inspiradas no material/do professor Jackson Meires, sendo comum encontrar elementos e padrões vinculados ao conteúdo e orientação dele durante as aulas.
-
 ## Quando baixar o projeto, o que fazer? 
 **1. Instalar as dependências do projeto**  
 `composer install`  

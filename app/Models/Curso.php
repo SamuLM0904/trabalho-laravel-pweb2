@@ -27,6 +27,18 @@ class Curso extends Model
         return $this->hasMany(Turma::class);
     }
 
+    public function alunos()
+    {
+        return $this->belongsToMany(
+            Aluno::class,
+            'matriculas',
+            'curso_id',
+            'aluno_id'
+        )
+            ->withPivot('turma_id', 'data_matricula')
+            ->withTimestamps();
+    }
+
     public function matriculas()
     {
         return $this->hasMany(Matricula::class);
