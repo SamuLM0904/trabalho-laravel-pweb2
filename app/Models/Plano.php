@@ -24,4 +24,4 @@ class Plano extends Model
     {
         return $this->hasMany(Aluno::class);
     }
-}
+};
