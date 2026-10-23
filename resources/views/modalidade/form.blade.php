@@ -24,7 +24,7 @@
                 <textarea id="descricao" name="descricao" rows="4" class="form-control">{{ old('descricao', $data->descricao ?? '') }}</textarea>
             </div>
             <div class="col-6 mb-3">
-                <label for="imagem" class="form-label">Foto ilustrativa (JPG/PNG, até 2 MB)</label>
+                <label for="imagem" class="form-label">Foto ilustrativa (JPG/PNG, até 5 MB)</label>
                 @if (!empty($data->imagem))
                     <div class="mb-2">
                         <img src="{{ asset('storage/' . $data->imagem) }}" alt="Imagem atual de {{ $data->nome }}"

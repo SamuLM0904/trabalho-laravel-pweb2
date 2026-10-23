@@ -27,7 +27,16 @@ Código-Fonte do Projeto desenvolvido durante as aulas de programação web 2 co
 **Para exibir as fotos enviadas no sistema**  
 `php artisan storage:link`
 
-No sistema da academia, cadastre pelo menos um plano antes de cadastrar alunos. Cada aluno pode ter uma única avaliação física.
+No sistema da academia, cadastre pelo menos um plano e uma modalidade antes de cadastrar alunos. Cada aluno pode ter uma única avaliação física.
+
+O esquema MySQL completo também está em `database/sql/db_academia.sql`. Importe o arquivo no MySQL/MariaDB configurado no `.env` e execute `php artisan db:seed` para criar os dados de demonstração.
+
+Para entrar após executar `php artisan migrate --seed`, use a conta de demonstração:
+
+- E-mail: `admin@academia.com`
+- Senha: `password`
+
+Altere a senha da conta antes de disponibilizar o sistema fora do ambiente de demonstração.
 
 **Se ainda apresentar erro 500, deve gerar a key do projeto**  
 `php artisan key:generate` 

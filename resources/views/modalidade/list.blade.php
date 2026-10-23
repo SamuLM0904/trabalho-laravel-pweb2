@@ -22,6 +22,7 @@
     </div>
 
     <div class="row mt-4">
+        <div class="table-responsive">
         <table class="table table-striped table-hover">
             <thead>
                 <tr>
@@ -63,5 +64,6 @@
                 @endforelse
             </tbody>
         </table>
+        </div>
     </div>
 @stop

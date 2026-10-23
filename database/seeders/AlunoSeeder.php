@@ -2,8 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Aluno;
+use App\Models\Modalidade;
+use App\Models\Plano;
+use Illuminate\Database\Seeder;
 
 class AlunoSeeder extends Seeder
 {
@@ -12,6 +14,9 @@ class AlunoSeeder extends Seeder
      */
     public function run(): void
     {
-        Aluno::factory()->count(5)->create();
+        Aluno::factory()->count(5)->create([
+            'plano_id' => Plano::query()->firstOrFail()->id,
+            'modalidade_id' => Modalidade::query()->firstOrFail()->id,
+        ]);
     }
 }

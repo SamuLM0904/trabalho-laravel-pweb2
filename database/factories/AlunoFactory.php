@@ -2,9 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Aluno;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\CategoriaAluno;
 
 class AlunoFactory extends Factory
 {
@@ -14,7 +12,9 @@ class AlunoFactory extends Factory
             'nome' => fake()->name(),
             'cpf' => fake()->numerify('###.###.###-##'),
             'telefone' => fake()->phoneNumber(),
-            'categoria_id' => (CategoriaAluno::All()->random())->id,
+            'email' => fake()->unique()->safeEmail(),
+            'endereco' => fake()->streetAddress().', '.fake()->city(),
+            'data_nascimento' => fake()->dateTimeBetween('-65 years', '-18 years')->format('Y-m-d'),
         ];
     }
 }

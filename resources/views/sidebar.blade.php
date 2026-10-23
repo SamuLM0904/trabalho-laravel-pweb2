@@ -7,30 +7,40 @@
       <a class="navbar-brand" href="{{ route('dashboard') }}">SIG-ACAD</a>
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link" href="{{ route('dashboard') }}">Início</a>
+          <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"
+            @if (request()->routeIs('dashboard')) aria-current="page" @endif
+            href="{{ route('dashboard') }}">Início</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ url('aluno') }}">Aluno</a>
+          <a class="nav-link {{ request()->is('aluno*') ? 'active' : '' }}"
+            @if (request()->is('aluno*')) aria-current="page" @endif
+            href="{{ url('aluno') }}">Aluno</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ url('plano') }}">Planos</a>
+          <a class="nav-link {{ request()->is('plano*') ? 'active' : '' }}"
+            @if (request()->is('plano*')) aria-current="page" @endif
+            href="{{ url('plano') }}">Planos</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ url('modalidade') }}">Modalidades</a>
+          <a class="nav-link {{ request()->is('modalidade*') ? 'active' : '' }}"
+            @if (request()->is('modalidade*')) aria-current="page" @endif
+            href="{{ url('modalidade') }}">Modalidades</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ url('avaliacao') }}">Avaliações</a>
+          <a class="nav-link {{ request()->is('avaliacao*') ? 'active' : '' }}"
+            @if (request()->is('avaliacao*')) aria-current="page" @endif
+            href="{{ url('avaliacao') }}">Avaliações</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ url('equipamento') }}">Equipamentos</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{{ url('curso') }}">Cursos</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{{ url('matricula') }}">Matrículas</a>
+          <a class="nav-link {{ request()->is('equipamento*') ? 'active' : '' }}"
+            @if (request()->is('equipamento*')) aria-current="page" @endif
+            href="{{ url('equipamento') }}">Equipamentos</a>
         </li>
       </ul>
+      <form action="{{ route('logout') }}" method="post">
+        @csrf
+        <button type="submit" class="btn btn-outline-secondary btn-sm">Sair</button>
+      </form>
     </div>
   </div>
 </nav>

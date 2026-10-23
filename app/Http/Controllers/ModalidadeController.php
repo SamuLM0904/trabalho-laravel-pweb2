@@ -28,7 +28,7 @@ class ModalidadeController extends Controller
         $data = $request->validate([
             'nome' => 'required|string|max:100',
             'descricao' => 'nullable|string|max:2000',
-            'imagem' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'imagem' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
         $data['imagem'] = $this->storeImage($request, 'imagem/modalidade');
@@ -49,7 +49,7 @@ class ModalidadeController extends Controller
         $data = $request->validate([
             'nome' => 'required|string|max:100',
             'descricao' => 'nullable|string|max:2000',
-            'imagem' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'imagem' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
         $modalidade = Modalidade::findOrFail($id);
@@ -72,6 +72,13 @@ class ModalidadeController extends Controller
     public function destroy($id)
     {
         $modalidade = Modalidade::findOrFail($id);
+        if ($modalidade->alunos()->exists()) {
+            return redirect('modalidade')->with(
+                'error',
+                "Não é possível remover a modalidade $modalidade->nome, pois existem alunos associados a ela."
+            );
+        }
+
         $this->deleteImage($modalidade->imagem);
         $modalidade->delete();
 
@@ -85,8 +92,8 @@ class ModalidadeController extends Controller
         ]);
 
         $consulta = Modalidade::query();
-        if (!empty($data['valor'])) {
-            $consulta->where('nome', 'like', '%' . $data['valor'] . '%');
+        if (! empty($data['valor'])) {
+            $consulta->where('nome', 'like', '%'.$data['valor'].'%');
         }
         $dados = $consulta->orderBy('nome')->get();
 

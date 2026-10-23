@@ -30,7 +30,7 @@ class EquipamentoController extends Controller
             'nome' => 'required|string|max:120',
             'numero_serie' => 'required|string|max:100|unique:equipamentos,numero_serie',
             'estado' => ['required', 'string', Rule::in(Equipamento::ESTADOS)],
-            'imagem' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'imagem' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
         $data['imagem'] = $this->storeImage($request, 'imagem/equipamento');
@@ -61,7 +61,7 @@ class EquipamentoController extends Controller
                 Rule::unique('equipamentos', 'numero_serie')->ignore($equipamento->id),
             ],
             'estado' => ['required', 'string', Rule::in(Equipamento::ESTADOS)],
-            'imagem' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'imagem' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
         ]);
 
         $imagemAnterior = $equipamento->imagem;

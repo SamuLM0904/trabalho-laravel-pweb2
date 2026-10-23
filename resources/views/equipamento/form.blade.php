@@ -35,7 +35,7 @@
                 </select>
             </div>
             <div class="col-6 mb-3">
-                <label for="imagem" class="form-label">Foto do equipamento (JPG/PNG, até 2 MB)</label>
+                <label for="imagem" class="form-label">Foto do equipamento (JPG/PNG, até 5 MB)</label>
                 @if (!empty($data->imagem))
                     <div class="mb-2">
                         <img src="{{ asset('storage/' . $data->imagem) }}" alt="Foto atual de {{ $data->nome }}"

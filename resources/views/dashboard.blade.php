@@ -26,20 +26,20 @@
         <div class="col-12 col-lg-6">
             <div class="card">
                 <div class="card-body">
-                    {!! $alunosPorPlano->container() !!}
+                    {!! $alunosPorModalidade->container() !!}
                 </div>
             </div>
         </div>
         <div class="col-12 col-lg-6">
             <div class="card">
                 <div class="card-body">
-                    {!! $equipamentosPorEstado->container() !!}
+                    {!! $novosAlunosPorMes->container() !!}
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="{{ $alunosPorPlano->cdn() }}"></script>
-    {{ $alunosPorPlano->script() }}
-    {{ $equipamentosPorEstado->script() }}
+    <script src="{{ $alunosPorModalidade->cdn() }}"></script>
+    {{ $alunosPorModalidade->script() }}
+    {{ $novosAlunosPorMes->script() }}
 @stop

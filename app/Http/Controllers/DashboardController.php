@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Charts\AlunosPorPlanoChart;
-use App\Charts\EquipamentosPorEstadoChart;
+use App\Charts\AlunosPorModalidadeChart;
+use App\Charts\NovosAlunosPorMesChart;
 use App\Models\Aluno;
 use App\Models\AvaliacaoFisica;
 use App\Models\Equipamento;
@@ -12,7 +12,7 @@ use App\Models\Plano;
 
 class DashboardController extends Controller
 {
-    public function index(AlunosPorPlanoChart $alunosPorPlano, EquipamentosPorEstadoChart $equipamentosPorEstado)
+    public function index(AlunosPorModalidadeChart $alunosPorModalidade, NovosAlunosPorMesChart $novosAlunosPorMes)
     {
         $totais = [
             'alunos' => Aluno::count(),
@@ -24,8 +24,8 @@ class DashboardController extends Controller
 
         return view('dashboard', [
             'totais' => $totais,
-            'alunosPorPlano' => $alunosPorPlano->build(),
-            'equipamentosPorEstado' => $equipamentosPorEstado->build(),
+            'alunosPorModalidade' => $alunosPorModalidade->build(),
+            'novosAlunosPorMes' => $novosAlunosPorMes->build(),
         ]);
     }
 }

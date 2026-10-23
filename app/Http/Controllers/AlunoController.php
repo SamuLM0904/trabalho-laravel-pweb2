@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\ManagesImages;
+use App\Models\Aluno;
+use App\Models\Modalidade;
+use App\Models\Plano;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use App\Models\Aluno;
-use App\Models\CategoriaAluno;
-use App\Models\Plano;
-use App\Http\Controllers\Concerns\ManagesImages;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class AlunoController extends Controller
 {
@@ -16,21 +17,20 @@ class AlunoController extends Controller
 
     public function index()
     {
-        $dados = Aluno::with(['categoria', 'plano', 'avaliacaoFisica'])->orderBy('nome')->get();
+        $dados = Aluno::with(['plano', 'modalidade', 'avaliacaoFisica'])->orderBy('nome')->get();
 
-        return view('aluno.list')->with(['dados' => $dados]);
+        return view('aluno.list', compact('dados'));
     }
 
-    function create()
+    public function create()
     {
-        $categorias = CategoriaAluno::orderBy('nome')->get();
         $planos = Plano::orderBy('nome')->get();
+        $modalidades = Modalidade::orderBy('nome')->get();
 
-        return view('aluno.form')->with(compact('categorias', 'planos'));
+        return view('aluno.form', compact('planos', 'modalidades'));
     }
 
-
-    function validateForm(Request $request, ?int $alunoId = null): array
+    public function validateForm(Request $request, ?int $alunoId = null): array
     {
         $cpfRule = Rule::unique('alunos', 'cpf');
         if ($alunoId !== null) {
@@ -46,24 +46,40 @@ class AlunoController extends Controller
                 $cpfRule,
             ],
             'telefone' => 'nullable|string|max:20',
-            'categoria_id' => 'required|exists:categoria_alunos,id',
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('alunos', 'email')->ignore($alunoId),
+            ],
+            'endereco' => 'required|string|max:255',
+            'data_nascimento' => 'required|date|before_or_equal:today',
+            'ativo' => 'required|boolean',
             'plano_id' => 'required|exists:planos,id',
-            'imagem' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
+            'modalidade_id' => 'required|exists:modalidades,id',
+            'imagem' => 'nullable|image|mimes:png,jpg,jpeg|max:5120',
         ], [
             'nome.required' => 'O nome é obrigatório.',
             'cpf.required' => 'O CPF é obrigatório.',
             'cpf.unique' => 'Já existe um aluno cadastrado com este CPF.',
-            'categoria_id.required' => 'A categoria é obrigatória.',
-            'categoria_id.exists' => 'A categoria selecionada não existe.',
+            'email.required' => 'O e-mail é obrigatório.',
+            'email.email' => 'Informe um endereço de e-mail válido.',
+            'email.unique' => 'Já existe um aluno cadastrado com este e-mail.',
+            'endereco.required' => 'O endereço é obrigatório.',
+            'data_nascimento.required' => 'A data de nascimento é obrigatória.',
+            'data_nascimento.before_or_equal' => 'A data de nascimento não pode ser futura.',
+            'ativo.required' => 'Informe se o aluno está ativo.',
             'plano_id.required' => 'O plano é obrigatório.',
             'plano_id.exists' => 'O plano selecionado não existe.',
+            'modalidade_id.required' => 'A modalidade é obrigatória.',
+            'modalidade_id.exists' => 'A modalidade selecionada não existe.',
             'imagem.image' => 'O arquivo enviado deve ser uma imagem.',
             'imagem.mimes' => 'A imagem deve estar no formato PNG, JPEG ou JPG.',
-            'imagem.max' => 'A imagem não pode ter mais de 2 MB.',
+            'imagem.max' => 'A imagem não pode ter mais de 5 MB.',
         ]);
     }
 
-    function store(Request $request)
+    public function store(Request $request)
     {
         $data = $this->validateForm($request);
         $data['imagem'] = $this->storeImage($request, 'imagem/aluno');
@@ -73,18 +89,16 @@ class AlunoController extends Controller
         return redirect('aluno')->with('success', 'Aluno salvo com sucesso!');
     }
 
-    function edit($id)
+    public function edit($id)
     {
         $data = Aluno::findOrFail($id);
-        $categorias = CategoriaAluno::orderBy('nome')->get();
         $planos = Plano::orderBy('nome')->get();
+        $modalidades = Modalidade::orderBy('nome')->get();
 
-        // dd($categorias);
-        return view('aluno.form')->with(compact('data', 'categorias', 'planos'));
+        return view('aluno.form', compact('data', 'planos', 'modalidades'));
     }
 
-
-    function update(Request $request, $id)
+    public function update(Request $request, $id)
     {
         $aluno = Aluno::findOrFail($id);
         $data = $this->validateForm($request, $aluno->id);
@@ -104,37 +118,45 @@ class AlunoController extends Controller
         return redirect('aluno')->with('success', 'Aluno atualizado com sucesso!');
     }
 
-    function destroy($id)
+    public function destroy($id)
     {
-        $aluno = Aluno::with('matriculas')->findOrFail($id);
-        if ($aluno->matriculas->isNotEmpty()) {
-            return redirect('aluno')->with(
-                'error',
-                "Não é possível remover o aluno $aluno->nome, pois existem matrículas associadas a ele."
-            );
-        }
+        $aluno = Aluno::findOrFail($id);
+        $imagem = $aluno->imagem;
+        $possuiAvaliacao = $aluno->avaliacaoFisica()->exists();
 
-        $this->deleteImage($aluno->imagem);
-        $aluno->delete();
+        DB::transaction(function () use ($aluno) {
+            $aluno->avaliacaoFisica()->delete();
+            $aluno->delete();
+        });
 
-        return redirect('aluno')->with('success', 'Aluno removido com sucesso!');
+        $this->deleteImage($imagem);
+
+        $mensagem = $possuiAvaliacao
+            ? 'Aluno removido com sucesso, junto com a avaliação física associada.'
+            : 'Aluno removido com sucesso!';
+
+        return redirect('aluno')->with('success', $mensagem);
     }
 
     public function search(Request $request)
     {
         $data = $request->validate([
-            'tipo' => ['required', 'string', Rule::in(['nome', 'cpf', 'telefone', 'plano'])],
+            'tipo' => ['required', 'string', Rule::in(['nome', 'cpf', 'telefone', 'email', 'plano', 'modalidade'])],
             'valor' => 'nullable|string|max:150',
         ]);
 
-        $consulta = Aluno::with(['categoria', 'plano', 'avaliacaoFisica']);
-        if (!empty($data['valor'])) {
+        $consulta = Aluno::with(['plano', 'modalidade', 'avaliacaoFisica']);
+        if (! empty($data['valor'])) {
             if ($data['tipo'] === 'plano') {
                 $consulta->whereHas('plano', function ($query) use ($data) {
-                    $query->where('nome', 'like', '%' . $data['valor'] . '%');
+                    $query->where('nome', 'like', '%'.$data['valor'].'%');
+                });
+            } elseif ($data['tipo'] === 'modalidade') {
+                $consulta->whereHas('modalidade', function ($query) use ($data) {
+                    $query->where('nome', 'like', '%'.$data['valor'].'%');
                 });
             } else {
-                $consulta->where($data['tipo'], 'like', '%' . $data['valor'] . '%');
+                $consulta->where($data['tipo'], 'like', '%'.$data['valor'].'%');
             }
         }
         $dados = $consulta->orderBy('nome')->get();
@@ -144,24 +166,21 @@ class AlunoController extends Controller
 
     public function report()
     {
-        $dados = Aluno::with(['categoria', 'plano'])->orderBy('nome')->get()->map(fn (Aluno $aluno) => [
-            'nome' => $aluno->nome,
-            'cpf' => $aluno->cpf,
-            'telefone' => $aluno->telefone,
-            'categoria' => $aluno->categoria->nome ?? '',
-            'plano' => $aluno->plano->nome ?? 'Sem plano',
-        ]);
+        $dados = Aluno::with(['plano', 'modalidade'])
+            ->where('ativo', true)
+            ->orderBy('plano_id')
+            ->orderBy('nome')
+            ->get()
+            ->map(fn (Aluno $aluno) => [
+                'nome' => $aluno->nome,
+                'cpf' => $aluno->cpf,
+                'telefone' => $aluno->telefone,
+                'plano' => $aluno->plano->nome ?? 'Sem plano',
+                'modalidade' => $aluno->modalidade->nome ?? 'Sem modalidade',
+            ]);
 
-        return Pdf::loadView('relatorios.tabela', [
-            'titulo' => 'Relatório de Alunos',
+        return Pdf::loadView('relatorios.alunos-por-plano', [
             'data' => now()->format('d/m/Y'),
-            'colunas' => [
-                'nome' => 'Nome',
-                'cpf' => 'CPF',
-                'telefone' => 'Telefone',
-                'categoria' => 'Categoria',
-                'plano' => 'Plano',
-            ],
             'dados' => $dados,
         ])->download('relatorio_alunos.pdf');
     }
