@@ -12,8 +12,7 @@ use App\Models\Plano;
 
 class DashboardController extends Controller
 {
-    public function index(AlunosPorModalidadeChart $alunosPorModalidade, NovosAlunosPorMesChart $novosAlunosPorMes)
-    {
+    public function index(AlunosPorModalidadeChart $alunosPorModalidade, NovosAlunosPorMesChart $novosAlunosPorMes)    {
         $totais = [
             'alunos' => Aluno::count(),
             'planos' => Plano::count(),
